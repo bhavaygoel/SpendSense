@@ -1,7 +1,7 @@
 import express, { Request, Response, json } from "express";
 import mongoose from "mongoose";
-import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from "dotenv"
 import { register } from "./controllers/register";
 import { login } from "./controllers/login";
 import { profile } from "./controllers/profile";
@@ -11,6 +11,8 @@ import { getTransaction } from "./controllers/getTransaction";
 import { deleteTransaction } from "./controllers/deleteTransaction";
 import { updateTransaction } from "./controllers/updateTransaction";
 
+dotenv.config()
+
 const app = express();
 app.use(
   cors({
@@ -19,7 +21,6 @@ app.use(
   })
 );
 app.use(json());
-app.use(cookieParser());
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World");
 });
@@ -28,14 +29,13 @@ app.post("/auth/register", register);
 app.post("/auth/login", login);
 app.post("/auth/logout", logout);
 app.get("/profile", profile);
-app.post("/transaction", createTransaction);
-app.get("/transaction", getTransaction);
+app.post("/createtransaction", createTransaction);
+app.post("/gettransaction", getTransaction);
 app.delete("/transaction/:id", deleteTransaction);
 app.patch("/transaction/:id", updateTransaction);
-
 mongoose
   .connect(
-    "mongodb+srv://goelbhavay:pCLPaobuVonyMqJn@cluster0.wmhjjxc.mongodb.net/?retryWrites=true&w=majority"
+    `${process.env.MONGODB_URI}`
   )
   .then(() => {
     app.listen(5000, () => {

@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import Transaction from "../models/transaction";
 export async function createTransaction(req: Request, res: Response) {
-  const { userId, amount, description, category } = req.body;
-  const date = new Date();
+  console.log("Received request");
+  
+  const { amount, description, date} = req.body;
+  const category = "Misc"
+  const userId = "6421ad7b7b08f5d7fbf7a1b3"
   const transaction = new Transaction({
     userId,
     amount,
@@ -10,7 +13,8 @@ export async function createTransaction(req: Request, res: Response) {
     category,
     date
   });
-
+  console.log("Done..");
+  
   const createdTransaction = await transaction.save();
   res.json(createdTransaction);
 }
