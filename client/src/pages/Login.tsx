@@ -1,3 +1,4 @@
+import { Button } from "flowbite-react";
 import React, { useState } from "react";
 import { useCookies } from "react-cookie";
 import { Link, Navigate } from "react-router-dom";
@@ -17,6 +18,8 @@ function Login() {
   }
   
   async function handleLogin(e: React.FormEvent) {
+    console.log("Requested for login");
+    
     e.preventDefault();
     const response = await fetch("http://localhost:5000/auth/login", {
       method: "POST",
@@ -26,12 +29,12 @@ function Login() {
       }),
       headers: {
         "Content-type": "application/json",
-      },
-      credentials: "include", // Include credentials in the request (cookies)
+      }
     });
     if (response.ok) {
-      const user = await response.json();
-      // Store the user data in state or context
+      const data = await response.json();
+      const { token } = data;
+      localStorage.setItem('token', token);
     }
     setSuccess(true)
   }
@@ -71,7 +74,7 @@ function Login() {
                               placeholder="••••••••" 
                               className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required/>
                         </div>
-                        <button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Sign in</button>
+                        <Button type="submit">Sign in</Button>
                         <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                             Don’t have an account yet? <Link to="/register" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</Link>
                         </p>
