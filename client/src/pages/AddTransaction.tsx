@@ -1,6 +1,7 @@
 import { Button, Datepicker, Label, Textarea, TextInput } from "flowbite-react";
+import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function AddTransaction() {
     const [amount, setAmount] = useState(0);
@@ -13,14 +14,16 @@ function AddTransaction() {
         console.log("Sending Request for: ", amount, description);
         
         e.preventDefault();
-        
+        const token = localStorage.getItem('token');
+        const decodedToken = jwtDecode(token)
+        const { userId } = decodedToken;
         try {
             const response = await fetch("http://localhost:5000/createtransaction", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ amount, description,date }) // Use shorthand property names
+                body: JSON.stringify({ userId, amount, description,date })
             });
             
             if (response.ok) {

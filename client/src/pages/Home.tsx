@@ -1,7 +1,9 @@
 import { Button } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Budget } from "../Component/Card";
+import { BudgetCard } from "../Component/BudgetCard";
+import { jwtDecode } from "jwt-decode";
+
 
 type Transaction = {
   _id: string;
@@ -13,14 +15,23 @@ type Transaction = {
 }
 type TransactionArray = Transaction[];
 function Home() {
-  const [user, setUser] = useState("6421ad7b7b08f5d7fbf7a1b3");
   const [transactions, setTransactions] = useState<TransactionArray>();
+  const [budget, setBudget] = useState()
+  const [dailySpend, setDailySpend] = useState()
+  const [mothlySpend, setMothlySpend] = useState()
   const navigate = useNavigate()
   useEffect(() => {
-    setUser("6421ad7b7b08f5d7fbf7a1b3")
-    fetchTransaction()
-  }, [])
-  const fetchTransaction = async () =>{
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+    }
+    else{
+        const decodedToken = jwtDecode(token)
+        const { userId } = decodedToken;
+        fetchTransaction(userId)
+    }
+  }, [navigate])
+  const fetchTransaction = async (user) =>{
     try{
       const transact = await fetch("http://localhost:5000/gettransaction", {
       method: "POST",
@@ -34,7 +45,10 @@ function Home() {
       const transactData = await transact.json()
       console.log("dataArr: ", transactData);
       transactData.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-      setTransactions(transactData.transactions)
+      setBudget(transactData.budget);
+      setDailySpend(transactData.todaySum);
+      setMothlySpend(transactData.monthSum);
+      setTransactions(transactData.transactions);
     } catch (e){
       console.error(e);
     }
@@ -55,9 +69,26 @@ function Home() {
     
     return `${day} ${month} ${year}`;
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login')
+  }
 return (
   <div className="px-10 py-10">
-    <Budget />
+    <div className="flex justify-between mb-10">
+      <h1 className="font-bold text-xl">Your Spend Tracker!</h1>
+      <Button onClick={() => handleLogout()}>Log Out</Button>
+    </div>
+    <div className="flex justify-between">
+      <BudgetCard heading="Your Budget is: "  budget={budget} parent={true} setBudget={setBudget}/>
+      {budget !== 0 && (
+      <>
+        <BudgetCard heading="Your Daily spend is: " budget={dailySpend} percentage={(dailySpend * 100)/ (budget/30) } />
+        <BudgetCard heading="Your Monthly spend is: " budget={mothlySpend} percentage={(mothlySpend * 100)/ budget }/>
+      </>
+      )}
+    </div>
     <div className="flex justify-end mt-4">
       <Button  onClick={() => handleClick()} color="blue">
         Add Transaction

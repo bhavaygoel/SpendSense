@@ -10,6 +10,7 @@ import { createTransaction } from "./controllers/createTransaction";
 import { getTransaction } from "./controllers/getTransaction";
 import { deleteTransaction } from "./controllers/deleteTransaction";
 import { updateTransaction } from "./controllers/updateTransaction";
+import { updateBudget } from "./controllers/updateBudget";
 
 dotenv.config()
 
@@ -28,7 +29,7 @@ app.get("/", (req: Request, res: Response) => {
 app.post("/auth/register", register);
 app.post("/auth/login", login);
 app.post("/auth/logout", logout);
-app.get("/profile", profile);
+app.post("/editBudget", updateBudget);
 app.post("/createtransaction", createTransaction);
 app.post("/gettransaction", getTransaction);
 app.delete("/transaction/:id", deleteTransaction);

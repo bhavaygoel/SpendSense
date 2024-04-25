@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import Transaction from "../models/transaction";
+import UserModel from "../models/user";
 
 export async function getTransaction(req: Request, res: Response) {
   try{
     const { userId } = req.body;
     const transactions = await Transaction.find({ userId: userId });
-    console.log(transactions);
+    const user = await UserModel.findById(userId);
+    console.log(user);
+    
+    const budget = user ? user.budget : 0;
     const currentDate = new Date();
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -42,7 +46,7 @@ export async function getTransaction(req: Request, res: Response) {
     ]);
     const monthSum = monthResult.length > 0 ? monthResult[0].total : 0;
     const todaySum = todayResult.length > 0 ? todayResult[0].total : 0;
-    res.json({transactions,monthSum,todaySum});
+    res.json({transactions,monthSum,todaySum,budget});
 
   }catch (error) {
     console.error('Error while getting transaction:', error);

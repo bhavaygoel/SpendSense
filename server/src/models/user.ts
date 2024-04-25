@@ -16,6 +16,10 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
+  budget: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const UserModel = mongoose.model("User", UserSchema);
